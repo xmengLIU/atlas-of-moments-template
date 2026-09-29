@@ -1,5 +1,7 @@
-# Photos
+# Travel photographs
 
-为每个目的地创建一个与 `destination.id` 对应的文件夹，然后在 `src/data/destinations.ts` 中登记照片路径、宽度、高度、标题和说明。
+Create one folder for each destination. Using the destination ID as the folder name keeps the project easy to maintain.
 
-示例照片用于展示画廊布局，请在制作自己的站点时替换它们。
+Register each photograph in `src/data/destinations.ts` with its path, width, height, title, and caption.
+
+The sample photographs demonstrate the archive and mixed gallery layout. Replace them with photographs that you own before publishing a derivative travel map.
