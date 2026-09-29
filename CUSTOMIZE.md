@@ -1,13 +1,13 @@
-# 内容配置指南
+# Content configuration guide
 
-日常更新只需要修改 `src/data/destinations.ts` 和 `public/photos/`。
+Routine updates only require changes to `src/data/destinations.ts` and `public/photos/`.
 
-## 地区字段
+## Region fields
 
 ```ts
 {
   id: 'japan',
-  name: '日本',
+  name: 'Japan',
   englishName: 'Japan',
   continent: 'Asia',
   lat: 36.2,
@@ -17,13 +17,23 @@
   destinationIds: ['kyoto', 'nara'],
   introTitle: 'JAPAN,',
   introEmphasis: 'TWO CITIES, TWO TEMPOS.',
-  introCopy: ['English introduction.', '中文介绍。'],
+  introCopy: ['An English introduction.', 'A second introduction line.'],
 }
 ```
 
-`destinationIds` 决定地区页面中的档案顺序。列表中的每个 ID 都必须对应一个 `destinations` 对象。
+### Important region fields
 
-## 目的地字段
+- `id`: a unique lowercase identifier used by the application
+- `lat` and `lng`: the camera target and world-map marker position
+- `viewAltitude`: the camera distance after opening the region; values between `0.14` and `0.65` work well for most areas
+- `accent`: the marker and interface accent colour
+- `destinationIds`: the destination order shown in the region interface
+- `introTitle` and `introEmphasis`: the two parts of the large region heading
+- `introCopy`: two supporting lines, which may use one or two languages
+
+Every value in `destinationIds` must match an object inside `destinations`.
+
+## Destination fields
 
 ```ts
 {
@@ -31,7 +41,7 @@
   regionId: 'japan',
   name: 'KYOTO',
   englishName: 'Kyoto',
-  secondaryName: '京都',
+  secondaryName: 'Kyoto, Japan',
   language: 'en',
   region: 'Higashiyama · Gion',
   country: 'Kyoto · Japan',
@@ -41,15 +51,30 @@
   mood: 'SPRING WALK',
   eyebrow: 'A short sentence above the archive title',
   storyTitle: 'A TITLE CAN USE\nA LINE BREAK.',
-  story: ['English paragraph.', '中文段落。'],
+  story: [
+    'The first travel-journal paragraph.',
+    'The second travel-journal paragraph.',
+  ],
   accent: '#d9a29a',
   photos: [],
 }
 ```
 
-`story` 可以只有中文、只有英文，也可以像示例一样交替排列。
+### Important destination fields
 
-## 照片字段
+- `regionId`: must match the parent region's `id`
+- `name`: the large archive title
+- `secondaryName`: an optional second-language or local name
+- `language`: controls minor language-specific presentation details
+- `lat` and `lng`: the destination marker and camera target
+- `date`: free-form display text, for example `2026.04` or `April 2026`
+- `mood`: a short uppercase archive category
+- `eyebrow`: the sentence displayed above the title on the cover
+- `storyTitle`: use `\n` when a deliberate line break is needed
+- `story`: any number of journal paragraphs, in one language or several
+- `accent`: a CSS colour used for the destination marker
+
+## Photograph fields
 
 ```ts
 {
@@ -63,19 +88,58 @@
 }
 ```
 
-`position` 是可选字段，对应 CSS 的 `background-position`。当人物或建筑在默认居中裁切下被遮挡时再添加它。
+- `id`: a unique identifier for the photograph
+- `title`: the short title displayed in the gallery and lightbox
+- `caption`: the description displayed beneath the title
+- `src`: an absolute path beginning with `/photos/`
+- `width` and `height`: the photograph's real pixel dimensions
+- `position`: optional CSS `background-position` used to adjust cropping
 
-## 常见问题
+The first item in the `photos` array becomes the destination's cover photograph.
 
-### 地图光点没有出现
+## Coordinates
 
-确认经纬度是数字，并检查 `regionId`、`destinationIds` 和目的地 `id` 是否完全一致。
+Use decimal latitude and longitude:
 
-### 图片无法显示
+- North latitude and east longitude are positive
+- South latitude and west longitude are negative
+- London: `lat: 51.5074`, `lng: -0.1278`
+- Sydney: `lat: -33.8688`, `lng: 151.2093`
 
-确认文件位于 `public/` 下，且 `src` 从 `/photos/` 开始。路径和文件名区分大小写。
+## Gallery layout
 
-### 画廊比例不理想
+The gallery reads every photograph's aspect ratio and automatically groups the images into feature rows, landscape pairs, portrait pairs, portrait trios, or mixed rows.
 
-填写图片真实的 `width` 与 `height`。布局会根据宽高比自动把照片分成横图、竖图与重点大图。
+For the best result:
+
+- Enter accurate dimensions
+- Mix landscape and portrait photographs when possible
+- Place a strong landscape image first if it should become the cover
+- Keep captions concise enough to remain readable over an image
+
+## Troubleshooting
+
+### A map marker does not appear
+
+Check that the coordinates are numbers. Confirm that the destination `id`, its `regionId`, and the parent region's `destinationIds` entry match exactly.
+
+### A photograph does not load
+
+Confirm that the file exists inside `public/`, and that its `src` begins with `/photos/`. Paths and filenames are case-sensitive after deployment.
+
+### The gallery proportions look incorrect
+
+Verify the real `width` and `height` values. The layout depends on them even before the full photograph has loaded.
+
+### The cover crops the subject
+
+Add or adjust the optional position value:
+
+```ts
+position: 'center 30%'
+```
+
+### Destination labels overlap
+
+Labels are automatically staggered according to their order in `destinationIds`. Reordering that list is usually enough to improve the result for nearby markers.
 
