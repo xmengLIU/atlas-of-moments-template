@@ -1,78 +1,215 @@
 # Atlas of Moments
 
-一套可以直接复用的个人旅行民族志地图模板。访客从一颗缓慢旋转的 3D 地球进入地区，再打开每个目的地的全屏旅行档案。
+**Atlas of Moments** is an open-source 3D travel map template for turning personal journeys into interactive photo archives.
 
-## 模板包含
+Instead of presenting travel photographs as a conventional album, the project places them back on a globe. Visitors can rotate the Earth, select a region, open an individual destination, and explore its photographs, coordinates, travel date, field notes, and image captions.
 
-- 可拖动、缩放和自动旋转的 3D 地球
-- 世界地区与地区内目的地两级导航
-- 封面大图、地点、坐标、日期与旅行手记
-- 自动适配横图、竖图和不同尺寸的照片画廊
-- 单张照片说明、全屏查看、上一张和下一张
-- 桌面端与移动端响应式布局
-- 中英文内容支持
+The original website was created from photographs taken during trips between 2025 and 2026. This repository is a lightweight reusable version with sample content, designed for anyone who wants to build a personal travel map without creating the interface from scratch.
 
-## 一分钟开始
+## Live project
+
+[View the original Atlas of Moments website](https://atlas-of-moments.lmx2420175935.chatgpt.site)
+
+The live project contains the full personal archive. This repository contains a smaller sample dataset that is easier to download, understand, and replace.
+
+## What the website can do
+
+- Display destinations on a draggable, zoomable, auto-rotating 3D globe
+- Organize content in two levels: travel regions and individual destinations
+- Move the camera smoothly from the world view to a selected local area
+- Open each destination as a full-screen editorial archive
+- Show a cover photograph, location, coordinates, travel date, theme, and field notes
+- Arrange landscape and portrait photographs automatically according to their dimensions
+- Open photographs in a full-screen lightbox
+- Navigate with previous, next, and close controls
+- Support Chinese, English, or bilingual travel writing
+- Adapt the interface for desktop and mobile screens
+
+## “Static” does not mean non-interactive
+
+Atlas of Moments is a **client-side interactive website**. It does not require a backend server, database, account system, or content-management service.
+
+The 3D globe, camera movement, archive transitions, gallery layout, and lightbox controls are all powered by React and JavaScript in the visitor's browser. The word *static* only describes how the site is hosted: the hosting provider serves the compiled HTML, CSS, JavaScript, textures, and photographs directly.
+
+This makes the project easy to deploy on services such as GitHub Pages, Vercel, Netlify, Cloudflare Pages, or any other static hosting provider.
+
+## Technology
+
+- React
+- TypeScript
+- Vite
+- react-globe.gl
+- Three.js
+- Lucide React
+
+## Getting started
+
+### 1. Create your copy
+
+Click **Use this template** on GitHub, or clone the repository:
+
+```bash
+git clone https://github.com/xmengLIU/atlas-of-moments-template.git
+cd atlas-of-moments-template
+```
+
+### 2. Install the dependencies
 
 ```bash
 npm install
+```
+
+### 3. Start the local website
+
+```bash
 npm run dev
 ```
 
-打开终端显示的本地地址，就可以看到示例旅行地图。
+Open the local address shown in the terminal. Vite will update the page automatically while you edit the content.
 
-## 换成你的旅行内容
+## Add your own destinations
 
-### 1. 放入照片
+All frequently edited travel content is stored in one file:
 
-在 `public/photos/` 下为每个目的地创建一个文件夹：
+```text
+src/data/destinations.ts
+```
+
+The file contains two collections:
+
+- `travelRegions`: the large areas shown on the world map, such as Japan, the United Kingdom, or Hangzhou
+- `destinations`: the individual archives inside those regions, such as Kyoto, Cambridge, or West Lake
+
+The included Hangzhou sample demonstrates how one region can contain several independent destinations.
+
+### Add a region
+
+Copy an existing object inside `travelRegions` and change its ID, title, coordinates, accent colour, camera altitude, introduction, and destination IDs.
+
+```ts
+{
+  id: 'japan',
+  name: 'Japan',
+  englishName: 'Japan',
+  continent: 'Asia',
+  lat: 36.2,
+  lng: 138.2,
+  viewAltitude: 0.5,
+  accent: '#d9a29a',
+  destinationIds: ['kyoto', 'nara'],
+  introTitle: 'JAPAN,',
+  introEmphasis: 'TWO CITIES, TWO TEMPOS.',
+  introCopy: ['An English introduction.', 'A second introduction line.'],
+}
+```
+
+### Add a destination
+
+Copy an existing object inside `destinations`. The destination's `regionId` must match the parent region's `id`, and its own `id` must also appear in the parent's `destinationIds` list.
+
+Every destination can define:
+
+- Display names in one or two languages
+- Region and country labels
+- Latitude and longitude
+- Travel date
+- Theme and accent colour
+- Archive headline and introductory sentence
+- One or more travel-journal paragraphs
+- Any number of captioned photographs
+
+See [CUSTOMIZE.md](./CUSTOMIZE.md) for complete field examples and troubleshooting notes.
+
+## Add your photographs
+
+Create one folder for each destination inside `public/photos/`:
 
 ```text
 public/photos/
-└── my-destination/
+└── kyoto/
     ├── 01.jpg
     ├── 02.jpg
     └── 03.jpg
 ```
 
-### 2. 编辑地点资料
+Then register the files in the destination's `photos` array:
 
-打开 `src/data/destinations.ts`。模板的地区、目的地、坐标、日期、手记和每张照片的说明都集中在这一个文件里。
+```ts
+{
+  id: 'kyoto-01',
+  title: 'MORNING IN GION',
+  caption: 'The first light reaches the stone street.',
+  src: '/photos/kyoto/01.jpg',
+  width: 2000,
+  height: 1333,
+  position: 'center 45%',
+}
+```
 
-- `travelRegions`：世界地图上的一级地区，例如日本、英国或杭州
-- `destinations`：地区里的具体目的地，例如京都、剑桥或西湖
-- `lat` / `lng`：经纬度；北纬和东经使用正数，南纬和西经使用负数
-- `viewAltitude`：进入地区后的镜头高度，通常使用 `0.14`–`0.65`
-- `photos`：照片路径、尺寸、标题和说明
+The first photograph becomes the archive cover. The optional `position` value changes its crop when the main subject is not centred.
 
-复制现有示例对象并修改内容，是添加新地点最快的方式。务必让 `destination.regionId` 与对应地区的 `id` 一致，并把目的地 `id` 加入该地区的 `destinationIds`。
+### Recommended image preparation
 
-### 3. 检查并生成正式版本
+- Use JPG or WebP for photographs
+- Resize the longest edge to approximately 1600–2400 pixels
+- Keep file sizes reasonable for faster loading
+- Enter the photograph's real `width` and `height`
+- Use lowercase filenames with numbers and hyphens
+- Avoid spaces and non-ASCII characters in file paths
+
+Accurate dimensions are important because the gallery uses each image's aspect ratio to create balanced rows of landscape and portrait photographs.
+
+## Project structure
+
+```text
+atlas-of-moments-template/
+├── public/
+│   ├── assets/                 # Earth and background textures
+│   └── photos/                 # Replace with your travel photographs
+├── src/
+│   ├── data/
+│   │   └── destinations.ts     # Regions, destinations, writing, and captions
+│   ├── App.tsx                 # Globe, archive, gallery, and lightbox interactions
+│   ├── index.css               # Visual design and responsive layouts
+│   └── main.tsx
+├── CUSTOMIZE.md                # Detailed content guide
+├── index.html
+└── package.json
+```
+
+## Build the production version
 
 ```bash
 npm run build
+```
+
+The finished site will be generated in `dist/`.
+
+To inspect that version locally:
+
+```bash
 npm run preview
 ```
 
-## 照片建议
+## Deployment
 
-- JPG 或 WebP 均可，建议长边控制在 1600–2400 像素
-- 第一张照片会成为档案封面
-- 请填写真实的 `width` 与 `height`，画廊会据此组合横图和竖图
-- 需要调整裁切位置时，可以给照片增加 `position: 'center 35%'`
-- 文件名建议使用小写英文、数字和连字符，避免空格
+Because the project does not require a backend, deployment only needs the generated `dist/` directory.
 
-更完整的字段示例见 [CUSTOMIZE.md](./CUSTOMIZE.md)。
+Common options include:
 
-## 技术栈
+- **GitHub Pages:** deploy the Vite build output with a GitHub Actions workflow
+- **Vercel:** import the repository, select Vite, and keep the default build settings
+- **Netlify:** use `npm run build` as the build command and `dist` as the publish directory
+- **Cloudflare Pages:** use `npm run build` and publish `dist`
 
-React、TypeScript、Vite、react-globe.gl 与 Three.js。
+## Sample photographs and privacy
 
-## 部署
+The repository includes six reduced-size sample photographs so the archive and mixed gallery layout work immediately after installation. They are included for demonstration and are not covered by the software licence.
 
-这是一个纯静态网站。执行 `npm run build` 后，可将生成的 `dist/` 部署到 GitHub Pages、Vercel、Netlify、Cloudflare Pages 或任意静态托管服务。
+When publishing your own version, review every photograph, caption, date, and coordinate before deployment. Anything committed to a public repository or deployed on a public website should be treated as publicly accessible.
 
-## 授权
+## Licence
 
-网站代码使用 [MIT License](./LICENSE)。`public/photos/` 中的示例旅行照片仅用于演示模板，不包含在 MIT 授权中；制作自己的站点时请替换为你拥有使用权的照片。
+The source code is available under the [MIT License](./LICENSE).
 
+The sample photographs in `public/photos/` remain the copyright of their original photographer and should be replaced in derivative travel-map projects.
